@@ -150,6 +150,7 @@ I start by collecting the six halfedges, four vertices, and two faces around the
 <p>
 Once the new connections are in place, I proceed to update the representative halfedges for the affected vertices, edge, and faces. One detail I pay attention to is that a vertex’s representative halfedge must still start at that vertex. Since flipping the edge changes the origins of some halfedges, I thus explicitly update these references to match the new connections. I also return immediately for boundary edges. 
 </p>
+<p>I ran into a bug where the flipped triangles had incorrect next pointers, so I traced each triangle’s three halfedges and fixed the connections until following next() three times returned to the starting halfedge.</p>
 
 <h3>Results</h3>
 
