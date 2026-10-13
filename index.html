@@ -1,5 +1,7 @@
 <html>
 	<head>
+		<meta charset="utf-8">
+		<title>CS184 Homework 2 - Steven Sun</title>
 		<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=default'></script>
 		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
 		<style>
@@ -26,91 +28,330 @@
 		</style>
 	</head>
 	<body>
-		<div class="container">
-		<h1>CS184/284A Fall 2026 Homework 2 Write-Up</h1>
-		<div style="text-align: center;">Names: </div>
+<div class="container">
+<h1>CS184/284A Fall 2026 Homework 2 Write-Up</h1>
+<div style="text-align: center;">Names: Steven Sun</div>
+<br>
+Link to webpage: <a href="https://cal-cs184-student.github.io/hw2-steven-writeup/">https://cal-cs184-student.github.io/hw2-steven-writeup/</a>
+<br>
+Link to write-up GitHub repository: <a href="https://github.com/cal-cs184-student/hw2-steven-writeup">https://github.com/cal-cs184-student/hw2-steven-writeup</a>
+<br>
+Link to code repository: <a href="https://github.com/cal-cs184-student/hw2-steven">https://github.com/cal-cs184-student/hw2-steven</a>
 
-		<br>
 
-		Link to webpage: (TODO) <a href="https://cs184.eecs.berkeley.edu/fa26">cs184.eecs.berkeley.edu/fa26</a>
+<h2>Overview</h2>
 
-		<br>
-		
-		Link to GitHub repository: (TODO) <a href="https://cs184.eecs.berkeley.edu/fa26">cs184.eecs.berkeley.edu/fa26</a>
+<p>
+At a high level, in this assignment I implemented Bezier curves and surfaces, area-weighted vertex normals, and operations for editing and subdividing triangle meshes. I also added support for boundary edges and an additional subdivision scheme. Together, these features make it possible to evaluate smooth surfaces and change the geometry and connectivity of a mesh. It was interesting to see how changing only the triangulation of a cube can change the shape it approaches after subdivision. Furthermore, I thought that comparing the rendered results made the connection between the mesh structure and the final surface much easier to see and cooler!
+</p>
 
-		<figure>
-			<img src="assets/teapot.png" alt="Teapot" style="width:50%"/>
-			<figcaption>You can add images with captions!</figcaption>
-		</figure>
+<h2>Part 1: Bezier Curves with 1D de Casteljau Subdivision</h2>
 
-		<!--
-		We've already added one heading per part, to make your write-up as navigable when grading. Please fit your write-up within these sections!
-		-->
+<h3>Algorithm and implementation</h3>
 
-		<h2>Overview</h2>
-		Give a high-level overview of what you implemented in this homework. Think about what you've built as a whole. Share your thoughts on what interesting things you've learned from completing the homework.
+<p>
+De Casteljau's algorithm repeatedly interpolates between neighboring control points. For my implementation, for each pair, I calculate (1 - t) * points[i] + t * points[i + 1] and append the result to a new vector. Then, because each call to evaluateStep() performs only one level, n input points will produce n - 1 output points. Thus, repeating this process leaves one point, which is exactly the position on the Bezier curve at t.
+</p>
 
-		<h2>Section I: Bezier Curves and Surfaces</h2>
+<h3>Results</h3>
 
-		<h3>Part 1: Bezier curves with 1D de Casteljau subdivision</h3>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+<p>
+I used six control points: (0.15, 0.25), (0.30, 0.80), (0.55, 0.65), (0.85, 0.15), (1.15, 0.85), and (1.35, 0.40). The screenshots below show each level at t = 0.5, with the completed curve shown in green. The white points are the original controls, the blue points show the intermediate calculations, and the final point is red.
+</p>
 
-		<p>Here is an example 2x2 gridlike structure using an HTML table. Each <b>tr</b> is a row and each <b>td</b> is a column in that row. You might find this useful for framing and showing your result images in an organized fashion.</p>
-		<div style="display: flex; flex-direction: column; align-items: center;">
-			<table style="width: 100%; text-align: center; border-collapse: collapse;">
-			  <tr>
-				<td style="text-align: center;">
-				  <img src="assets/teapot.png" width="400px"/>
-				  <figcaption>Caption goes here.</figcaption>
-				</td>
-				<td style="text-align: center;">
-				  <img src="assets/teapot.png" width="400px"/>
-				  <figcaption>Caption goes here.</figcaption>
-				</td>
-			  </tr>
-			  <tr>
-				<td style="text-align: center;">
-				  <img src="assets/teapot.png" width="400px"/>
-				  <figcaption>Caption goes here.</figcaption>
-				</td>
-				<td style="text-align: center;">
-				  <img src="assets/teapot.png" width="400px"/>
-				  <figcaption>Caption goes here.</figcaption>
-				</td>
-			  </tr>
-			</table>
-		</div>
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+<figure style="margin: 0;">
+<img src="assets/part1-level0.png" alt="Level 0: 6 original control points" style="width: 100%;">
+<figcaption>Level 0: 6 original control points</figcaption>
+</figure>
+<figure style="margin: 0;">
+<img src="assets/part1-level1.png" alt="Level 1: 5 points in the newest level" style="width: 100%;">
+<figcaption>Level 1: 5 points in the newest level</figcaption>
+</figure>
+</div>
 
-		<h3>Part 2: Bezier surfaces with separable 1D de Casteljau</h3>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+<figure style="margin: 0;">
+<img src="assets/part1-level2.png" alt="Level 2: 4 points in the newest level" style="width: 100%;">
+<figcaption>Level 2: 4 points in the newest level</figcaption>
+</figure>
+<figure style="margin: 0;">
+<img src="assets/part1-level3.png" alt="Level 3: 3 points in the newest level" style="width: 100%;">
+<figcaption>Level 3: 3 points in the newest level</figcaption>
+</figure>
+</div>
 
-		<h2>Section II: Triangle Meshes and Half-Edge Data Structure</h2>
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+<figure style="margin: 0;">
+<img src="assets/part1-level4.png" alt="Level 4: 2 points in the newest level" style="width: 100%;">
+<figcaption>Level 4: 2 points in the newest level</figcaption>
+</figure>
+<figure style="margin: 0;">
+<img src="assets/part1-level5.png" alt="Level 5: 1 final evaluated point" style="width: 100%;">
+<figcaption>Level 5: 1 final evaluated point</figcaption>
+</figure>
+</div>
 
-		<h3>Part 3: Area-weighted vertex normals</h3>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+<figure>
+<img src="assets/part1-modified.png" alt="After moving the third control point and increasing t with mouse scrolling." style="width: 100%;">
+<figcaption>After moving the third control point  and increasing t with mouse scrolling.</figcaption>
+</figure>
 
-		<h3>Part 4: Edge flip</h3>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+<p>
+Moving the control point changes the curve itself, while increasing t with mouse scrolling moves the evaluated point farther along the curve. In this modified example, the red point is farther to the right and the middle of the green curve is lower relative to the previous results.
+</p>
 
-		<h3>Part 5: Edge split</h3>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+<h2>Part 2: Bezier Surfaces with Separable 1D de Casteljau</h2>
 
-		<h3>Part 6: Loop subdivision for mesh upsampling</h3>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+<h3>Implementation</h3>
 
-		<h2>(Optional) Section III: Potential Extra Credit - Art Competition: Model something Creative</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+<p>
+De Casteljau’s algorithm extends to Bezier surfaces by applying the same curve evaluation, but in two directions. For my implementation, I first evaluate each row of the 2D control point grid at u, which gives one intermediate point per row. Then, I evaluate a Bezier curve through those intermediate points at v to get the final surface point. In my implementation, evaluateStep() interpolates between neighboring 3D points, and evaluate1D() repeats this step until one point remains. Finally, evaluate(u, v) calls evaluate1D() on each row using u, then on the resulting points using v.
+</p>
 
-		<h2>Additional Notes (please remove)</h2>
-		<ul>
-			<li>You can also add code if you'd like as so: <code>code code code</code></li>
-			<li>If you'd like to add math equations, 
-				<ul>
-					<li>You can write inline equations like so: \( a^2 + b^2 = c^2 \)</li>
-					<li>You can write display equations like so: \[ a^2 + b^2 = c^2 \]</li>
-				</ul>
-			</li>
-		</ul>
-		</div>
-	</body>
+
+<figure>
+<img src="assets/part2-teapot.png" alt="bez/teapot.bez evaluated by my Bezier surface implementation." style="width: 100%;">
+<figcaption>bez/teapot.bez evaluated by my Bezier surface implementation.</figcaption>
+</figure>
+
+<h2>Part 3: Area-Weighted Vertex Normals</h2>
+
+<h3>Implementation</h3>
+
+<p>
+To implement the area-weighted vertex normals, starting from a vertex's halfedge, I visit each neighboring face by repeatedly following twin()->next(). For each actual triangle, I take the cross product of the two edge vectors from the vertex and add it to a running sum. The cross product's magnitude is twice the triangle's area, so larger triangles automatically contribute more. Then, I normalize only the final sum, giving a unit normal with the correct area weighting. I skipped virtual boundary faces, because they are not actual triangles.
+</p>
+
+<h3>Comparison</h3>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+<figure style="margin: 0;">
+<img src="assets/part3-flat.png" alt="dae/teapot.dae with flat shading" style="width: 100%;">
+<figcaption>dae/teapot.dae with flat shading</figcaption>
+</figure>
+<figure style="margin: 0;">
+<img src="assets/part3-smooth.png" alt="The same view with area-weighted vertex normals" style="width: 100%;">
+<figcaption>The same view with area-weighted vertex normals</figcaption>
+</figure>
+</div>
+
+<p>
+With flat shading, the individual faces are visible as abrupt changes in brightness. However, after toggling Q, the shading changes smoothly across neighboring triangles, especially visibly on the body and handle. It is clear that the geometry and silhouette stay the same, and that the difference comes from the normals used for shading.
+</p>
+
+<h2>Part 4: Edge Flip</h2>
+
+<h3>Implementation</h3>
+<p>
+I start by collecting the six halfedges, four vertices, and two faces around the selected interior edge. From there, I then flip the shared diagonal so that it connects the two opposite vertices instead. In order to make the pointer updates easier to follow, I keep references to the entire original neighborhood before changing anything, and this lets me use setNeighbors() to rebuild each triangle’s cycle without having to traverse connections that I have already modified.
+</p>
+
+<p>
+Once the new connections are in place, I proceed to update the representative halfedges for the affected vertices, edge, and faces. One detail I pay attention to is that a vertex’s representative halfedge must still start at that vertex. Since flipping the edge changes the origins of some halfedges, I thus explicitly update these references to match the new connections. I also return immediately for boundary edges. 
+</p>
+
+<h3>Results</h3>
+
+<figure>
+<img src="assets/part4-before.png" alt="Teapot before edge flips." style="width: 100%;">
+<figcaption>Teapot before edge flips.</figcaption>
+</figure>
+
+<figure>
+<img src="assets/part4-after.png" alt="After flipping three diagonals near the center of the teapot." style="width: 100%;">
+<figcaption>After flipping three diagonals near the center of the teapot.</figcaption>
+</figure>
+
+<p>
+You can see that the three diagonals change direction, while their surrounding vertices remain in place. The mesh stays connected and no holes appear in the edited region.
+</p>
+
+<h2>Part 5: Edge Split</h2>
+
+<h3>Implementation</h3>
+
+<p>
+For an interior edge, I first insert a new vertex at the midpoint of its endpoints. Then, I connect this vertex to the two opposite vertices, turning the original two triangles into four. This adds one vertex, three edges, six halfedges, and two faces. To keep the connections organized, I use setNeighbors() to rebuild each triangle’s halfedge cycle before updating the affected representative pointers. I also make sure the new vertex’s representative halfedge points along one half of the original edge, as required.
+</p>
+
+<p>
+One implementation detail I use to prepare for Part 6 is to distinguish between edges that come from the original edge and edges that connect to the opposite vertices. Although splitting creates new mesh elements, I mark both halves of the original edge as old and only mark the edges to the opposite vertices as new. I mark the inserted vertex as new as well. This makes it easier to identify which edges to flip during Loop subdivision.
+</p>
+
+<h3>Results</h3>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+<figure style="margin: 0;">
+<img src="assets/part4-after.png" alt="Before splits" style="width: 100%;">
+<figcaption>Before splits</figcaption>
+</figure>
+<figure style="margin: 0;">
+<img src="assets/part5-splits.png" alt="After splitting three edges" style="width: 100%;">
+<figcaption>After splitting three edges</figcaption>
+</figure>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+<figure style="margin: 0;">
+<img src="assets/part4-after.png" alt="Before the combined edits" style="width: 100%;">
+<figcaption>Before the combined edits</figcaption>
+</figure>
+<figure style="margin: 0;">
+<img src="assets/part5-mixed.png" alt="After splits, an additional flip, and another split" style="width: 100%;">
+<figcaption>After splits, an additional flip, and another split</figcaption>
+</figure>
+</div>
+
+<p>
+The split edges gain midpoint vertices and additional triangles. For the combined example, I then flipped the vertical edge between two of the edited regions and split another nearby edge. The new connections remain attached to the surrounding mesh.
+</p>
+
+<h3>Extra credit: Boundary edge splits</h3>
+
+<p>
+For a boundary edge, I first choose the halfedge whose face is the actual interior triangle. This gives me a consistent starting point for reconnecting the mesh. Then, I insert a midpoint vertex and split that triangle into two. One detail I pay attention to is the virtual boundary face: instead of treating it as another triangle, I insert the additional boundary halfedge into its existing loop. This keeps the boundary connected without triangulating the virtual face. Overall, the split adds one vertex, two edges, four halfedges, and one actual face.
+</p>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+<figure style="margin: 0;">
+<img src="assets/extra-boundary-before.png" alt="Before: the selected left edge has isBoundary() = 1" style="width: 100%;">
+<figcaption>Before: the selected left edge has isBoundary() = 1</figcaption>
+</figure>
+<figure style="margin: 0;">
+<img src="assets/extra-boundary-after.png" alt="After: a midpoint divides the left edge and its adjacent triangle" style="width: 100%;">
+<figcaption>After: a midpoint divides the left edge and its adjacent triangle</figcaption>
+</figure>
+</div>
+
+<h2>Part 6: Loop Subdivision for Mesh Upsampling</h2>
+
+<h3>Implementation</h3>
+
+<p>
+I first compute all updated positions using the original mesh and store them in newPosition. For an old interior vertex with n neighbors, I use (1 - n * u) * position + u * neighbor_sum, where u is 3/16 when n = 3 and 3/(8n) otherwise. For an interior edge with endpoints A and B and opposite vertices C and D, the new position is 3/8 * (A + B) + 1/8 * (C + D).
+</p>
+
+<p>
+Next, I split every original edge and flip only new edges that connect an old vertex to a new vertex.
+</p>
+<p>
+One bug I ran into was updating vertex positions before finishing all of the position calculations. As a result, some vertices used neighbors that had already moved, while others used the original positions. This made the subdivision depend on the order I visited the vertices. To fix this, I first calculate every new position using the original mesh and store it in newPosition. Then, I apply the saved positions only after completing the edge splits and flips.
+</p>
+
+<h3>Cube subdivision and preprocessing</h3>
+
+<p>
+The left column shows the original cube after repeated Loop subdivision. Its sharp edges and corners become rounded, and the shape shrinks because the new positions average neighboring vertices. The cube also becomes asymmetric.
+</p>
+
+<p>
+This happens because the original face diagonals give the cube's corners different neighbor arrangements. Although the cube starts with a symmetric shape, its triangle connections are not symmetric. Since Loop subdivision uses these neighbors to calculate new positions, the corners move differently and the asymmetry becomes visible after repeated subdivisions.
+</p>
+<p>
+For the right column, I split the diagonal on each of the six square faces before subdividing. Each face then has four triangles meeting at its center. The eight corners now have equivalent neighborhoods and degree six, while the six face-center vertices have degree four. This makes the connectivity symmetric across the cube, so the weighted updates preserve that symmetry.
+</p>
+
+
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+<figure style="margin: 0;">
+<img src="assets/part6-original0.png" alt="Original triangulation, 0 Loop iterations" style="width: 100%;">
+<figcaption>Original triangulation, 0 Loop iterations</figcaption>
+</figure>
+<figure style="margin: 0;">
+<img src="assets/part6-symmetric0.png" alt="Face diagonals split, 0 Loop iterations" style="width: 100%;">
+<figcaption>Face diagonals split, 0 Loop iterations</figcaption>
+</figure>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+<figure style="margin: 0;">
+<img src="assets/part6-original1.png" alt="Original triangulation, 1 Loop iteration" style="width: 100%;">
+<figcaption>Original triangulation, 1 Loop iteration</figcaption>
+</figure>
+<figure style="margin: 0;">
+<img src="assets/part6-symmetric1.png" alt="Face diagonals split, 1 Loop iteration" style="width: 100%;">
+<figcaption>Face diagonals split, 1 Loop iteration</figcaption>
+</figure>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+<figure style="margin: 0;">
+<img src="assets/part6-original2.png" alt="Original triangulation, 2 Loop iterations" style="width: 100%;">
+<figcaption>Original triangulation, 2 Loop iterations</figcaption>
+</figure>
+<figure style="margin: 0;">
+<img src="assets/part6-symmetric2.png" alt="Face diagonals split, 2 Loop iterations" style="width: 100%;">
+<figcaption>Face diagonals split, 2 Loop iterations</figcaption>
+</figure>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+<figure style="margin: 0;">
+<img src="assets/part6-original3.png" alt="Original triangulation, 3 Loop iterations" style="width: 100%;">
+<figcaption>Original triangulation, 3 Loop iterations</figcaption>
+</figure>
+<figure style="margin: 0;">
+<img src="assets/part6-symmetric3.png" alt="Face diagonals split, 3 Loop iterations" style="width: 100%;">
+<figcaption>Face diagonals split, 3 Loop iterations</figcaption>
+</figure>
+</div>
+<p>
+We can also see from the results that pre-splitting the edges also makes the corners move less, so the cube stays closer to its original size. This happens because the corners are connected to nearby face centers instead of corners across the faces. Essentially, the cube still becomes rounded after subdivision, but pre-splitting helps reduce how much it shrinks. 
+</p>
+
+<h3>Extra credit: Loop subdivision with boundaries</h3>
+
+<p>
+For an old boundary vertex, I use 3/4 of its original position plus 1/8 of each of its two boundary neighbors. A new boundary-edge vertex uses the midpoint of its endpoints. The interior rules remain the same, and boundary edges are never flipped. The example starts from the boundary-split square in Part 5; the open boundary stays intact while the corners become rounded.
+</p>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+<figure style="margin: 0;">
+<img src="assets/extra-boundary-loop1.png" alt="Boundary mesh after 1 Loop iteration" style="width: 100%;">
+<figcaption>Boundary mesh after 1 Loop iteration</figcaption>
+</figure>
+<figure style="margin: 0;">
+<img src="assets/extra-boundary-loop2.png" alt="Boundary mesh after 2 Loop iterations" style="width: 100%;">
+<figcaption>Boundary mesh after 2 Loop iterations</figcaption>
+</figure>
+</div>
+
+<h3>Extra credit: Square-root-three subdivision</h3>
+
+<p>
+I also implemented the &radic;3 subdivision scheme, using the B key. To implement, I first save the original edges and faces, compute the updated positions of the old vertices, and add a centroid to each triangle, so each centroid is connected to the three original corners. Then, I flip every original edge and apply the saved positions. For a vertex with n neighbors, alpha = (4 - 2 * cos(2 * pi / n)) / 9, and its new position is (1 - alpha) * position + (alpha / n) * neighbor_sum. This implementation supports closed meshes.
+</p>
+
+<p>
+Each iteration triples the triangle count, as opposed to multiplying it by four for Loop subdivision. From the results, you can see the cube becomes smoother, and the edge directions change because the original edges are flipped. Compared with the Loop images above, the mesh is less dense at the same number of iterations.
+</p>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+<figure style="margin: 0;">
+<img src="assets/part6-original0.png" alt="Original cube" style="width: 100%;">
+<figcaption>Original cube</figcaption>
+</figure>
+<figure style="margin: 0;">
+<img src="assets/extra-sqrt3-1.png" alt="After 1 square-root-three iteration" style="width: 100%;">
+<figcaption>After 1 square-root-three iteration</figcaption>
+</figure>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+<figure style="margin: 0;">
+<img src="assets/extra-sqrt3-2.png" alt="After 2 square-root-three iterations" style="width: 100%;">
+<figcaption>After 2 square-root-three iterations</figcaption>
+</figure>
+<figure style="margin: 0;">
+<img src="assets/extra-sqrt3-3.png" alt="After 3 square-root-three iterations" style="width: 100%;">
+<figcaption>After 3 square-root-three iterations</figcaption>
+</figure>
+</div>
+
+
+
+</div>
+</body>
 </html>
